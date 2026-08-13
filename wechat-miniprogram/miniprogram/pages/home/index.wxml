@@ -1,0 +1,12 @@
+<view class="page home safe-bottom">
+  <view class="hero"><view class="status-space"></view><rain-brand></rain-brand><view class="hero-copy"><text class="eyebrow">TODAY'S BAKE</text><text class="headline">今天出炉，\n今天带走。</text><text class="subline">当天制作 · 预约自提 · 售完即止</text></view></view>
+  <view class="store-card card"><view><text class="pill">到店自提</text><text class="store-name">小雨面包 · 首店</text><text class="store-meta">营业中 · 21:30 打烊</text></view><text class="arrow">›</text></view>
+  <button class="slot card" bindtap="chooseSlot"><view><text>预约取货</text><text class="slot-time">今天 {{selectedSlot.displayTime || '准备中'}}</text></view><view class="slot-right"><text>余 {{selectedSlot.availableCapacity || 0}} 单可约</text><text>⌄</text></view></button>
+  <view class="fresh"><text>新鲜提示</text><text>下午第二炉可颂 15:30 出炉</text></view>
+  <scroll-view class="categories" scroll-x enhanced show-scrollbar="{{false}}"><view class="category-row"><button wx:for="{{categories}}" wx:key="*this" class="{{category === item ? 'active' : ''}}" data-value="{{item}}" bindtap="chooseCategory">{{item}}</button></view></scroll-view>
+  <view class="menu"><view class="section-head"><view><text class="section-title">{{category === '全部' ? '今日推荐' : category}}</text><text class="section-sub">当日制作 · 售完即止</text></view><text>{{visibleProducts.length}} 款</text></view>
+    <view wx:if="{{loading}}" class="loading">正在同步今日菜单…</view>
+    <product-card wx:for="{{visibleProducts}}" wx:key="id" product="{{item}}" quantity="{{cart[item.id] || 0}}" bind:add="add" bind:remove="remove"></product-card>
+  </view>
+  <button wx:if="{{itemCount > 0}}" class="cart-bar" bindtap="checkout"><view class="bag">▱<text class="badge">{{itemCount}}</text></view><view><text>已选 {{itemCount}} 件</text><text class="cart-price">¥{{subtotal}}</text></view><text class="go">去结算</text></button>
+</view>

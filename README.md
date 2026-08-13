@@ -1,4 +1,13 @@
-# vinext-starter
+# 小雨面包预约自提
+
+本仓库包含两个交付形态：
+
+- `app/`、`lib/`：用于产品评审和业务验收的 Site。
+- `wechat-miniprogram/`：实际导入微信开发者工具的原生微信小程序与云函数工程。
+
+微信小程序的体验、云开发初始化、支付和银豹接入说明见 [wechat-miniprogram/README.md](wechat-miniprogram/README.md)。
+
+## Site 技术说明
 
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and

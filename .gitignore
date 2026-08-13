@@ -38,3 +38,6 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+*.tsbuildinfo
+wechat-miniprogram/project.private.config.json
+wechat-miniprogram/cloudfunctions/**/node_modules/

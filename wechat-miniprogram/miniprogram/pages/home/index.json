@@ -1,0 +1,1 @@
+{ "navigationStyle": "custom", "usingComponents": { "rain-brand": "/components/rain-brand/index", "product-card": "/components/product-card/index" } }

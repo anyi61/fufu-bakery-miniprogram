@@ -1,0 +1,1 @@
+<view class="flow"><view wx:for="{{steps}}" wx:key="*this" class="step {{index <= current ? 'done' : ''}}"><view class="dot"></view><text>{{item}}</text></view></view>

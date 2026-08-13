@@ -23,6 +23,23 @@ const eslintConfig = defineConfig([
   jsxA11y.flatConfigs.recommended,
   next.configs["core-web-vitals"],
   {
+    files: ["wechat-miniprogram/**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        ...globals.node,
+        wx: "readonly",
+        App: "readonly",
+        Page: "readonly",
+        Component: "readonly",
+        getApp: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
     languageOptions: {
       globals: {
         ...globals.browser,

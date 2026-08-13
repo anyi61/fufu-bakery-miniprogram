@@ -1,0 +1,6 @@
+<view class="product {{product.isSoldOut || product.availableStock === 0 ? 'sold' : ''}}">
+  <view class="photo"><image src="{{product.imageUrl}}" mode="aspectFill"></image><text wx:if="{{product.tag && !product.isSoldOut}}">{{product.tag}}</text><view wx:if="{{product.isSoldOut || product.availableStock === 0}}" class="sold-mask">已售罄</view></view>
+  <view class="copy"><view><text class="title">{{product.name}}</text><text class="subtitle">{{product.subtitle}}</text><text class="stock {{product.availableStock <= 3 ? 'low' : ''}}">{{product.isSoldOut || product.availableStock === 0 ? '暂不可购买' : '今日余量 ' + product.availableStock}}</text></view>
+    <view class="foot"><text class="price">¥{{price}}</text><view wx:if="{{quantity > 0}}" class="step"><button bindtap="remove">−</button><text>{{quantity}}</text><button bindtap="add">＋</button></view><button wx:else class="add" disabled="{{product.isSoldOut || product.availableStock === 0}}" bindtap="add">＋</button></view>
+  </view>
+</view>

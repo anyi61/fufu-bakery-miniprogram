@@ -1,0 +1,1 @@
+<view class="brand {{compact ? 'compact' : ''}}"><view class="rain"><view class="drop"></view><view class="drop"></view><view class="drop"></view></view><view><text class="name">小雨面包</text><text class="en">XIAOYU BAKEHOUSE</text></view></view>

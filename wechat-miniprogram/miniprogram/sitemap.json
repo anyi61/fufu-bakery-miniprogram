@@ -1,0 +1,4 @@
+{
+  "desc": "小雨面包预约自提小程序页面索引",
+  "rules": [{ "action": "allow", "page": "pages/home/index" }, { "action": "disallow", "page": "*" }]
+}

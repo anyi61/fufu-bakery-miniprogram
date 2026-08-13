@@ -1,0 +1,19 @@
+{
+  "appid": "touristappid",
+  "projectname": "xiaoyu-bakery-miniprogram",
+  "description": "小雨面包预约自提微信小程序",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "setting": {
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": false,
+    "coverView": true,
+    "enhance": true,
+    "useCompilerPlugins": false
+  },
+  "simulatorType": "wechat",
+  "condition": {}
+}
