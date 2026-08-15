@@ -1,1 +1,25 @@
-<view class="page profile safe-bottom"><view class="profile-head"><button class="avatar" bindtap="login"><image wx:if="{{userInfo}}" src="{{userInfo.avatarUrl}}"></image><text wx:else>雨</text></button><view><text class="hello">{{userInfo ? userInfo.nickName : '下午好，面包朋友'}}</text><text class="muted">{{userInfo ? '订单会关联当前微信身份' : '点击头像授权基础资料'}}</text></view></view><view class="stats card"><view><text>2</text><text>优惠券</text></view><view><text>0</text><text>积分</text></view><view><text>1</text><text>收藏</text></view></view><view class="menu card"><button><text>♧</text><text>常用取货人</text><text>›</text></button><button><text>♡</text><text>过敏原偏好</text><text>›</text></button><button open-type="contact"><text>♙</text><text>联系客服</text><text>›</text></button><button><text>ⓘ</text><text>门店与资质</text><text>›</text></button></view><button class="merchant-entry" bindtap="merchant">进入门店工作台</button><button wx:if="{{demoMode}}" class="reset" bindtap="reset">重置体验数据</button></view>
+<view class="page profile safe-bottom">
+  <view class="profile-head">
+    <view class="avatar" role="button" aria-label="授权微信头像和昵称" bindtap="login">
+      <image wx:if="{{userInfo}}" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <text wx:else>雨</text>
+    </view>
+    <view class="profile-copy">
+      <text class="hello">{{userInfo ? userInfo.nickName : '下午好，面包朋友'}}</text>
+      <text class="muted">{{userInfo ? '订单会关联当前微信身份' : '点击头像授权基础资料'}}</text>
+    </view>
+  </view>
+  <view class="stats card">
+    <view><text>2</text><text>优惠券</text></view>
+    <view><text>0</text><text>积分</text></view>
+    <view><text>1</text><text>收藏</text></view>
+  </view>
+  <view class="menu card">
+    <view class="menu-row" role="button" data-title="常用取货人" bindtap="comingSoon"><text class="menu-icon">♧</text><text class="menu-label">常用取货人</text><text class="menu-arrow">›</text></view>
+    <view class="menu-row" role="button" data-title="过敏原偏好" bindtap="comingSoon"><text class="menu-icon">♡</text><text class="menu-label">过敏原偏好</text><text class="menu-arrow">›</text></view>
+    <view class="menu-row contact-row"><text class="menu-icon">♙</text><text class="menu-label">联系客服</text><text class="menu-arrow">›</text><button class="contact-hit" open-type="contact" aria-label="联系客服"></button></view>
+    <view class="menu-row" role="button" data-title="门店与资质" bindtap="comingSoon"><text class="menu-icon">ⓘ</text><text class="menu-label">门店与资质</text><text class="menu-arrow">›</text></view>
+  </view>
+  <button class="merchant-entry" bindtap="merchant">进入门店工作台</button>
+  <button wx:if="{{demoMode}}" class="reset" bindtap="reset">重置体验数据</button>
+</view>

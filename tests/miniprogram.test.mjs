@@ -37,6 +37,120 @@ test("所有小程序与云函数 JavaScript 均可解析", async () => {
   }
 });
 
+test("确认订单页使用时间滚轮选择可约自提时段", async () => {
+  const [template, page] = await Promise.all([
+    readFile(new URL("miniprogram/pages/checkout/index.wxml", root), "utf8"),
+    readFile(new URL("miniprogram/pages/checkout/index.js", root), "utf8"),
+  ]);
+  assert.match(template, /<picker[^>]+mode="selector"[^>]+bindchange="chooseSlot"/);
+  assert.doesNotMatch(template, /bindtap="chooseSlot"/);
+  assert.match(page, /Number\(event\.detail\.value\)/);
+  assert.match(page, /availableCapacity > 0/);
+});
+
+test("时间滚轮更新当前时段且无效结算状态禁止提交", async () => {
+  const require = createRequire(import.meta.url);
+  const pagePath = fileURLToPath(new URL("miniprogram/pages/checkout/index.js", root));
+  let definition;
+  global.Page = (value) => { definition = value; };
+  const app = { globalData: { selectedSlotId: 1 } };
+  global.getApp = () => app;
+  delete require.cache[pagePath];
+  require(pagePath);
+  const slots = [{ id: 1, displayTime: "15:40–15:50" }, { id: 2, displayTime: "16:00–16:10" }];
+  const context = { data: { slots }, setData(value) { Object.assign(this.data, value); } };
+  definition.chooseSlot.call(context, { detail: { value: "1" } });
+  assert.equal(context.data.slotIndex, 1);
+  assert.equal(context.data.slot.id, 2);
+  assert.equal(app.globalData.selectedSlotId, 2);
+  let toast;
+  global.wx = { showToast(value) { toast = value; return value; } };
+  const emptyCartContext = { data: { paying: false, lines: [], slot: slots[0] }, setData() { throw new Error("空购物车不应进入支付状态"); } };
+  await definition.submit.call(emptyCartContext);
+  assert.deepEqual(toast, { title: "购物车为空，请先选择商品", icon: "none" });
+  const emptySlotContext = { data: { paying: false, lines: [{ id: 1 }], slot: null }, setData() { throw new Error("空时段不应进入支付状态"); } };
+  await definition.submit.call(emptySlotContext);
+  assert.deepEqual(toast, { title: "请选择可约取货时段", icon: "none" });
+  delete global.Page;
+  delete global.getApp;
+  delete global.wx;
+});
+
+test("直接进入空购物车结算页时返回点单首页", async () => {
+  const require = createRequire(import.meta.url);
+  const pagePath = fileURLToPath(new URL("miniprogram/pages/checkout/index.js", root));
+  let definition;
+  global.Page = (value) => { definition = value; };
+  global.getApp = () => ({ globalData: { bootstrap: { products: [], slots: [] }, cart: {} } });
+  let toast;
+  let target;
+  global.wx = {
+    showToast(value) { toast = value; },
+    switchTab(value) { target = value; return value; },
+  };
+  delete require.cache[pagePath];
+  require(pagePath);
+  definition.onLoad.call({ setData() { throw new Error("空购物车不应初始化结算金额"); } });
+  assert.deepEqual(toast, { title: "购物车为空，请先选择商品", icon: "none" });
+  assert.deepEqual(target, { url: "/pages/home/index" });
+  delete global.Page;
+  delete global.getApp;
+  delete global.wx;
+});
+
+test("我的页面头像和菜单使用稳定的固定边界布局", async () => {
+  const [template, styles, page] = await Promise.all([
+    readFile(new URL("miniprogram/pages/profile/index.wxml", root), "utf8"),
+    readFile(new URL("miniprogram/pages/profile/index.wxss", root), "utf8"),
+    readFile(new URL("miniprogram/pages/profile/index.js", root), "utf8"),
+  ]);
+  assert.doesNotMatch(template, /<button class="avatar"/);
+  assert.doesNotMatch(template, /<button class="menu-row"/);
+  assert.match(template, /class="contact-hit" open-type="contact"/);
+  assert.equal((template.match(/bindtap="comingSoon"/g) || []).length, 3);
+  assert.match(page, /comingSoon\(event\)/);
+  // Declarations are checked independently so harmless CSS reordering does not break the regression test.
+  const avatarRule = styles.match(/\.avatar\{([^}]*)\}/)?.[1] || "";
+  assert.match(avatarRule, /width:110rpx/);
+  assert.match(avatarRule, /max-width:110rpx/);
+  assert.match(avatarRule, /flex:0 0 110rpx/);
+  const menuRowRule = styles.match(/\.menu-row\{([^}]*)\}/)?.[1] || "";
+  assert.match(menuRowRule, /width:100%/);
+  assert.match(menuRowRule, /display:flex/);
+  assert.match(styles.match(/\.menu-label\{([^}]*)\}/)?.[1] || "", /flex:1/);
+  assert.match(styles.match(/\.menu-arrow\{([^}]*)\}/)?.[1] || "", /flex:0 0 32rpx/);
+});
+
+test("我的页面未开放菜单提供明确反馈", async () => {
+  const require = createRequire(import.meta.url);
+  const pagePath = fileURLToPath(new URL("miniprogram/pages/profile/index.js", root));
+  let definition;
+  global.getApp = () => ({ globalData: { config: { demoMode: true } } });
+  global.Page = (value) => { definition = value; };
+  let toast;
+  global.wx = { showToast(value) { toast = value; } };
+  delete require.cache[pagePath];
+  require(pagePath);
+  definition.comingSoon({ currentTarget: { dataset: { title: "常用取货人" } } });
+  assert.deepEqual(toast, { title: "常用取货人即将开放", icon: "none" });
+  delete global.getApp;
+  delete global.Page;
+  delete global.wx;
+});
+
+test("首页样式不保留已移除的门店、时段和横向分类规则", async () => {
+  const styles = await readFile(new URL("miniprogram/pages/home/index.wxss", root), "utf8");
+  for (const selector of ["store-card", "store-name", "store-meta", "slot", "slot-time", "slot-right", "categories", "category-row"]) {
+    assert.doesNotMatch(styles, new RegExp(`\\.${selector}(?:\\{|[ >.:])`));
+  }
+});
+
+test("首页 WXSS 不使用微信解析器不兼容的子选择器", async () => {
+  const styles = await readFile(new URL("miniprogram/pages/home/index.wxss", root), "utf8");
+  // 开发者工具会因子选择器拒绝整份页面样式，页面随后退化为普通文档流。
+  assert.doesNotMatch(styles, />/);
+});
+
 test("体验模式跑通预占、支付、门店状态和动态取餐码核销", async () => {
   let storage;
   global.wx = {

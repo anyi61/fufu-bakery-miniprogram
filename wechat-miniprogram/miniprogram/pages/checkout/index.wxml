@@ -1,4 +1,12 @@
-<view class="checkout page safe-bottom"><view class="card section"><view class="icon">⌖</view><view><text class="label">自提门店</text><text class="value">小雨面包 · 首店</text><text class="detail">正式地址待配置</text></view></view><view class="card section"><view class="icon">◷</view><view><text class="label">预约取货时间</text><text class="value">今天 {{slot.displayTime}}</text><text class="detail">当前余 {{slot.availableCapacity}} 单可约</text></view></view><view class="card section"><view class="icon">♙</view><view><text class="label">取货人</text><text class="value">张女士 · 138 **** 0826</text><text class="detail">仅用于取货通知与订单联系</text></view></view>
+<view class="checkout page safe-bottom">
+  <view class="card fulfillment">
+    <view class="fulfillment-head"><text class="fulfillment-mode">到店自提</text><text class="fulfillment-badge">仅支持自提</text></view>
+    <view class="store-block"><view class="store-line"><text class="location">⌖</text><text class="store-value">小雨面包 · 首店</text><text class="arrow">›</text></view><text class="store-address">门店地址待公布</text></view>
+    <picker class="pickup-picker" mode="selector" range="{{slots}}" range-key="pickerLabel" value="{{slotIndex}}" disabled="{{!slots.length}}" bindchange="chooseSlot">
+      <view class="pickup-line" role="button" aria-label="预约取货时间，今天 {{slot.displayTime || '暂无可约时段'}}，打开时间滚轮选择"><view><text class="pickup-label">预约取货</text><text class="pickup-time">今天 {{slot.displayTime || '暂无可约时段'}}</text></view><view class="pickup-action"><text>余 {{slot.availableCapacity || 0}} 单可约</text><text>{{slots.length ? '选择时段 ›' : '暂无可选时段'}}</text></view></view>
+    </picker>
+  </view>
+  <view class="card section"><view class="icon">♙</view><view><text class="label">取货人</text><text class="value">张女士 · 138 **** 0826</text><text class="detail">仅用于取货通知与订单联系</text></view></view>
   <view class="card goods"><text class="goods-title">商品明细</text><view wx:for="{{lines}}" wx:key="id" class="line"><image src="{{item.imageUrl}}" mode="aspectFill"></image><view><text>{{item.name}}</text><text class="detail">{{item.subtitle}}</text><text class="price">¥{{item.price}}</text></view><text>× {{item.quantity}}</text></view></view>
   <view class="card bill"><view><text>商品小计</text><text>¥{{subtotal}}</text></view><view><text>包装费</text><text>¥{{packageFee}}</text></view><view class="total"><text>合计</text><text>¥{{total}}</text></view></view>
   <view class="payment-note"><text>支付方式</text><text>微信支付（体验模式）</text></view><button class="primary submit" loading="{{paying}}" disabled="{{paying || !slot}}" bindtap="submit"><text>{{paying ? '正在锁定库存…' : '确认支付'}}</text><text>¥{{total}}</text></button><text class="agreement">提交即表示同意《用户协议》《退款规则》</text>
