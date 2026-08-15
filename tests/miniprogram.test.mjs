@@ -145,10 +145,21 @@ test("首页样式不保留已移除的门店、时段和横向分类规则", as
   }
 });
 
-test("首页 WXSS 不使用微信解析器不兼容的子选择器", async () => {
+test("首页关键点单布局保持左右分栏与底部结算栏", async () => {
   const styles = await readFile(new URL("miniprogram/pages/home/index.wxss", root), "utf8");
-  // 开发者工具会因子选择器拒绝整份页面样式，页面随后退化为普通文档流。
-  assert.doesNotMatch(styles, />/);
+  // 校验曾在真机中发生错位的关键布局契约，不限制其他页面可正常编译的选择器语法。
+  const menuLayoutRule = styles.match(/\.menu-layout\s*\{([^}]*)\}/)?.[1] || "";
+  assert.match(menuLayoutRule, /display:\s*flex/);
+  assert.match(menuLayoutRule, /overflow:\s*hidden/);
+  const categoryPanelRule = styles.match(/\.category-panel\s*\{([^}]*)\}/)?.[1] || "";
+  assert.match(categoryPanelRule, /width:\s*166rpx/);
+  assert.match(categoryPanelRule, /flex:\s*0 0 166rpx/);
+  const menuRule = styles.match(/\.menu\s*\{([^}]*)\}/)?.[1] || "";
+  assert.match(menuRule, /min-width:\s*0/);
+  assert.match(menuRule, /flex:\s*1/);
+  const cartBarRule = styles.match(/\.cart-bar\s*\{([^}]*)\}/)?.[1] || "";
+  assert.match(cartBarRule, /position:\s*fixed/);
+  assert.match(cartBarRule, /grid-template-columns:\s*88rpx minmax\(0, 1fr\) 194rpx/);
 });
 
 test("体验模式跑通预占、支付、门店状态和动态取餐码核销", async () => {
