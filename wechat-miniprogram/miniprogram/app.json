@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/landing/index",
     "pages/home/index",
     "pages/orders/index",
     "pages/profile/index",
@@ -20,9 +21,10 @@
     "backgroundColor": "#fffdf8",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/home/index", "text": "点单" },
-      { "pagePath": "pages/orders/index", "text": "订单" },
-      { "pagePath": "pages/profile/index", "text": "我的" }
+      { "pagePath": "pages/landing/index", "text": "首页", "iconPath": "assets/fufu/tabbar/home.png", "selectedIconPath": "assets/fufu/tabbar/home.png" },
+      { "pagePath": "pages/home/index", "text": "点单", "iconPath": "assets/fufu/tabbar/order.png", "selectedIconPath": "assets/fufu/tabbar/order.png" },
+      { "pagePath": "pages/orders/index", "text": "订单", "iconPath": "assets/fufu/tabbar/orders.png", "selectedIconPath": "assets/fufu/tabbar/orders.png" },
+      { "pagePath": "pages/profile/index", "text": "我的", "iconPath": "assets/fufu/tabbar/profile.png", "selectedIconPath": "assets/fufu/tabbar/profile.png" }
     ]
   },
   "style": "v2",

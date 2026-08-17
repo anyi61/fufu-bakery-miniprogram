@@ -162,6 +162,26 @@ test("首页关键点单布局保持左右分栏与底部结算栏", async () =>
   assert.match(cartBarRule, /grid-template-columns:\s*88rpx minmax\(0, 1fr\) 194rpx/);
 });
 
+test("FUFU 视觉首页提供四栏入口且插画适合进入主包", async () => {
+  const [appSource, template, page, artwork, ...tabIcons] = await Promise.all([
+    readFile(new URL("miniprogram/app.json", root), "utf8"),
+    readFile(new URL("miniprogram/pages/landing/index.wxml", root), "utf8"),
+    readFile(new URL("miniprogram/pages/landing/index.js", root), "utf8"),
+    readFile(new URL("miniprogram/assets/fufu/fufu-home-art.jpg", root)),
+    ...["home", "order", "orders", "profile"].map((name) => readFile(new URL(`miniprogram/assets/fufu/tabbar/${name}.png`, root))),
+  ]);
+  const app = JSON.parse(appSource);
+  assert.equal(app.pages[0], "pages/landing/index");
+  assert.deepEqual(app.tabBar.list.map((item) => item.text), ["首页", "点单", "订单", "我的"]);
+  assert.ok(app.tabBar.list.every((item) => item.iconPath && item.selectedIconPath));
+  assert.match(template, /class="hit hit-dine"[^>]+bindtap="goOrder"/);
+  assert.match(template, /class="hit hit-member"[^>]+bindtap="goProfile"/);
+  assert.match(template, /class="hit hit-express"[^>]+bindtap="express"/);
+  assert.match(page, /wx\.switchTab\(\{ url: "\/pages\/home\/index" \}\)/);
+  assert.ok(artwork.byteLength < 1024 * 1024, "首页插画应小于 1 MiB，避免挤占小程序主包");
+  assert.ok(tabIcons.every((icon) => icon.byteLength < 40 * 1024), "tabBar 图标应满足微信 40 KiB 单文件限制");
+});
+
 test("体验模式跑通预占、支付、门店状态和动态取餐码核销", async () => {
   let storage;
   global.wx = {

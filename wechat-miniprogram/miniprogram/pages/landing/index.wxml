@@ -1,0 +1,23 @@
+<view class="landing-page">
+  <image class="landing-art" src="/assets/fufu/fufu-home-art.jpg" mode="widthFix"></image>
+
+  <view class="brand" aria-label="FUFU BAKERY BAKERY HOUSE">
+    <view class="brand-arch">
+      <text class="letter l1">F</text><text class="letter l2">U</text><text class="letter l3">F</text><text class="letter l4">U</text>
+      <text class="letter gap"></text>
+      <text class="letter l5">B</text><text class="letter l6">A</text><text class="letter l7">K</text><text class="letter l8">E</text><text class="letter l9">R</text><text class="letter l10">Y</text>
+    </view>
+    <text class="brand-sub">BAKERY HOUSE</text>
+  </view>
+
+  <view class="service-copy dine"><text class="service-cn">到店自取</text><text class="service-en">DINE IN</text></view>
+  <view class="service-copy takeout"><text class="service-cn">外卖配送</text><text class="service-en">TAKE OUT</text></view>
+  <view class="service-copy express-copy"><text class="service-cn">快递邮寄</text><text class="service-en">EXPRESS</text></view>
+
+  <view class="member-copy"><text class="member-cn">会员\n充值中心</text><text class="member-en">MEMBER RECHARGE CENTER</text></view>
+
+  <button class="hit hit-dine" aria-label="到店自取" bindtap="goOrder"></button>
+  <button class="hit hit-takeout" aria-label="外卖配送" bindtap="goOrder"></button>
+  <button class="hit hit-express" aria-label="快递邮寄" bindtap="express"></button>
+  <button class="hit hit-member" aria-label="会员充值中心" bindtap="goProfile"></button>
+</view>
