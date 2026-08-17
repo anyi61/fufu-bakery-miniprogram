@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "triggers": [
+    {
+      "name": "t0probe-timer",
+      "type": "timer",
+      "config": "0 */5 * * * * *"
+    }
+  ]
+}

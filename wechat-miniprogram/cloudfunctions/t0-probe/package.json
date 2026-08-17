@@ -1,0 +1,10 @@
+{
+  "name": "xiaoyu-bakery-t0-probe",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "description": "T0 spike probe：验证 CloudBase 事务、条件更新、索引、定时触发器、网络能力与 SDK 安全回归；T0 证据归档后删除",
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  }
+}

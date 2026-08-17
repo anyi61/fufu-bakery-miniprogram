@@ -1,0 +1,47 @@
+{
+  "comment": "T0 spike 索引清单。微信云开发控制台或 CloudBase CLI 按此创建；证据归档后必须删除。envId 仅为占位，不得提交真实环境 ID。",
+  "envId": "<TEST_ENV_ID>",
+  "indexes": [
+    {
+      "collection": "t0probe_orders",
+      "name": "idx_t0probe_orders_customer_status_created_id",
+      "unique": false,
+      "keys": [
+        { "field": "customerOpenId", "direction": "asc" },
+        { "field": "status", "direction": "asc" },
+        { "field": "createdAt", "direction": "asc" },
+        { "field": "_id", "direction": "asc" }
+      ]
+    },
+    {
+      "collection": "t0probe_orders",
+      "name": "idx_t0probe_orders_status_expires_paymentdue",
+      "unique": false,
+      "keys": [
+        { "field": "status", "direction": "asc" },
+        { "field": "expiresAt", "direction": "asc" },
+        { "field": "paymentCheckDueAt", "direction": "asc" }
+      ]
+    },
+    {
+      "collection": "t0probe_attempts",
+      "name": "idx_t0probe_attempts_terminal_channel_settlement_review_nextretry",
+      "unique": false,
+      "keys": [
+        { "field": "terminal", "direction": "asc" },
+        { "field": "channelStatus", "direction": "asc" },
+        { "field": "settlementState", "direction": "asc" },
+        { "field": "settlementReviewState", "direction": "asc" },
+        { "field": "settlementNextRetryAt", "direction": "asc" }
+      ]
+    },
+    {
+      "collection": "t0probe_unique_conflict",
+      "name": "uniq_t0probe_merchant_order_no",
+      "unique": true,
+      "keys": [
+        { "field": "merchantOrderNo", "direction": "asc" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "xiaoyu-bakery-t0-probe-timer",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "description": "T0-D08 temporary minimal timer marker; delete after evidence archive",
+  "dependencies": {
+    "wx-server-sdk": "4.0.2"
+  }
+}

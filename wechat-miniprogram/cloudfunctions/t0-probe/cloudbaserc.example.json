@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "envId": "<TEST_ENV_ID>",
+  "functionRoot": ".",
+  "functions": [
+    {
+      "name": "t0-probe",
+      "timeout": 60,
+      "memorySize": 512,
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "installDependency": true,
+      "description": "T0 spike temporary probe; delete after evidence archive",
+      "envVariables": {
+        "T0_PROBE_ENABLED": "false",
+        "T0_PROBE_ENV_ID": "<TEST_ENV_ID>",
+        "T0_PROBE_OPERATOR_TOKEN": "<GENERATE_32_HEX_RANDOM>"
+      }
+    }
+  ]
+}

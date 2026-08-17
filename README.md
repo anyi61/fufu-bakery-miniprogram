@@ -1,109 +1,55 @@
-# 小雨面包预约自提
+# FUFU / 小雨面包微信小程序
 
-本仓库包含两个交付形态：
+面包预约自提项目，包含可点击业务 Demo、原生微信小程序、云函数和面向全面代码审查的产品与技术材料。
 
-- `app/`、`lib/`：用于产品评审和业务验收的 Site。
-- `wechat-miniprogram/`：实际导入微信开发者工具的原生微信小程序与云函数工程。
+> 当前仓库用于产品评审、技术验证和开发交接。CloudBase T0 动态验证尚未完成，不能据此判断已具备生产上线条件。
 
-微信小程序的体验、云开发初始化、支付和银豹接入说明见 [wechat-miniprogram/README.md](wechat-miniprogram/README.md)。
+## 仓库结构
 
-## Site 技术说明
+- `app/`、`lib/`：顾客端与商家端可点击 Site Demo。
+- `wechat-miniprogram/miniprogram/`：可导入微信开发者工具的原生小程序，包含 FUFU 首页、点单、结算、订单和个人中心。
+- `wechat-miniprogram/cloudfunctions/`：业务云函数、种子数据工具，以及临时 T0 探针。
+- `docs/`：PRD、库存模型、并发协议、安全审计、验证手册与阶段证据。
+- `tests/`：Site、小程序配置和 T0 探针逻辑的自动化测试。
+- `HANDOFF.md`：当前进度、验证结果、风险和后续工作。
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+## 快速开始
 
-## Prerequisites
-
-- Node.js `>=22.13.0`
-
-## Quick Start
+要求 Node.js `>=22.13.0`。
 
 ```bash
 npm install
+npm test
+npm run lint
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+原生小程序请在微信开发者工具中导入 `wechat-miniprogram/`。游客 AppID 可用于本地界面检查；云开发、支付、真机预览和发布需要有效 AppID 与对应权限。详细说明见 [wechat-miniprogram/README.md](wechat-miniprogram/README.md)。
 
-## Included Shape
+## 审查入口
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+建议按以下顺序阅读：
 
-## Workspace Auth Headers
+1. [产品需求文档](docs/小雨面包微信小程序-PRD-v1.1.md)
+2. [开发计划](docs/wechat-trial-run-dev-plan.md)
+3. [库存台账模型](docs/inventory-ledger-model.md)
+4. [订单并发协议](docs/order-concurrency-protocol.md)
+5. [T0 验证手册](docs/t0-probe-runbook.md)
+6. [SDK 与依赖安全审计](docs/t0-sdk-security-audit.md)
+7. [T0 阶段证据](docs/t0-spike-evidence.md)
+8. [交接文档](HANDOFF.md)
 
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+## 安全与生产边界
 
-The user ID is stable for the same user on the same Site and different across Sites. Email and name are intended for display or contact purposes.
+- 不要提交真实 AppID、CloudBase 环境 ID、密钥、操作员令牌、`project.private.config.json`、探针 `cloudbaserc.json` 或 `artifacts/` 动态产物。
+- T0 配置样例仅包含占位符；测试中的固定令牌为无权限的合成测试数据。
+- `wx-server-sdk@4.0.2` 的现有依赖链仍有 npm audit 报告项，详见安全审计文档，升级前需验证微信云函数兼容性。
+- 支付、库存扣减、幂等、并发与权限结论必须以真实测试环境的动态证据为准。
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+## 常用命令
 
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
-```
-
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+- `npm run dev`：启动 Site 本地开发环境。
+- `npm run build`：验证 Site 构建。
+- `npm test`：构建并执行全部自动化测试。
+- `npm run test:miniprogram`：只执行原生小程序回归测试。
+- `npm run lint`：执行 ESLint。

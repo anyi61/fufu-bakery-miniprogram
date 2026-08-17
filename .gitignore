@@ -42,3 +42,7 @@ yarn-error.log*
 *.tsbuildinfo
 wechat-miniprogram/project.private.config.json
 wechat-miniprogram/cloudfunctions/**/node_modules/
+
+# T0 probe dynamic evidence and local CLI config (never commit credentials)
+/artifacts/
+wechat-miniprogram/cloudfunctions/t0-probe/cloudbaserc.json

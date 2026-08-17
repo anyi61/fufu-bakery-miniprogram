@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "envId": "<TEST_ENV_ID>",
+  "functionRoot": ".",
+  "functions": [
+    {
+      "name": "t0-probe-timer",
+      "timeout": 10,
+      "memorySize": 256,
+      "runtime": "Nodejs20.19",
+      "handler": "index.main",
+      "installDependency": true,
+      "description": "T0-D08 temporary minimal timer marker; delete after evidence archive",
+      "envVariables": {
+        "T0_PROBE_ENABLED": "false",
+        "T0_PROBE_ENV_ID": "<TEST_ENV_ID>"
+      }
+    }
+  ]
+}
