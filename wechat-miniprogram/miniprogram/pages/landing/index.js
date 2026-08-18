@@ -5,7 +5,8 @@ Page({
   goProfile() {
     wx.switchTab({ url: "/pages/profile/index" });
   },
-  express() {
-    wx.showToast({ title: "快递邮寄即将开放", icon: "none" });
+  comingSoon(event) {
+    const title = event.currentTarget.dataset.title || "该服务";
+    wx.showToast({ title: title + "即将开放", icon: "none" });
   },
 });

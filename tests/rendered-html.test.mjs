@@ -5,13 +5,18 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 
 test("customer and merchant surfaces expose the pickup-only business flow", async () => {
-  const page = await readFile(new URL("app/page.tsx", root), "utf8");
+  const [page, layout] = await Promise.all([
+    readFile(new URL("app/page.tsx", root), "utf8"),
+    readFile(new URL("app/layout.tsx", root), "utf8"),
+  ]);
   assert.match(page, /小雨面包/);
   assert.match(page, /仅预约自提/);
   assert.match(page, /模拟微信支付/);
   assert.match(page, /门店工作台/);
   assert.match(page, /核销取货/);
   assert.doesNotMatch(page, /同城配送|配送地址|骑手/);
+  assert.match(page, /D1 模拟业务 Demo/);
+  assert.doesNotMatch(page + layout, /实时业务|真实库存|真实业务闭环/);
 });
 
 test("durable order flow has reservation, payment, audit and stock guards", async () => {

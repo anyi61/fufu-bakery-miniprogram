@@ -1,5 +1,5 @@
 module.exports = {
-  merchantOpenIds: [],
+  storeId: "store_xiaoyu_001",
   adapterMode: "demo",
   paymentMode: "demo",
   pospal: { enabled: false },

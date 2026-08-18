@@ -7,7 +7,7 @@
 - 顾客端：菜单、分类、实时余量、购物袋、自提时段、确认订单、体验支付、订单进度和动态取餐码。
 - 门店端：订单接单、制作、备妥、核销、生产看板、时段负载、库存和临时售罄。
 - 云后端：微信 `openid` 身份、员工白名单、事务预占、支付确认、状态机、审计和第三方集成事件。
-- 首发只支持预约到店自提，没有配送入口、地址、骑手或配送费用。
+- 首发只支持预约到店自提；FUFU 视觉首页保留外卖和快递入口，但均只提示“即将开放”，不会进入点单或生成配送订单。
 
 ## 立即体验：无 AppID / 无云环境
 
@@ -21,11 +21,11 @@
 
 1. 将 `project.config.json` 的 AppID 换成小雨面包自有小程序 AppID；建议用不提交 Git 的 `project.private.config.json` 保存本机配置。
 2. 在开发者工具开通云开发，创建环境，将环境 ID 写入 `miniprogram/config/runtime.js`。
-3. 创建集合：`products`、`pickup_slots`、`orders`、`audit_logs`、`integration_events`、`staff`。
+3. 创建集合：`products`、`inventory_plans`、`slot_plans`、`orders`、`order_reservations`、`order_idempotency`、`audit_logs`、`integration_events`、`staff`。
 4. 将数据库权限设置为所有客户端不可直接读写，可参考 `database.rules.json`。全部业务访问均经过云函数。
-5. 分别右键上传并部署 `cloudfunctions/bakery`、`cloudfunctions/seed`、`cloudfunctions/payment`，选择“云端安装依赖”。
-6. 临时执行一次 `seed` 云函数：初始化六个商品、当天三个时段，并将执行人的 `openid` 写入 `staff` 作为门店 owner。
-7. 把 `demoMode` 改成 `false`。保留 `paymentMode: "demo"` 可以先验收云数据库订单闭环。
+5. 按 `business-indexes.json` 创建业务索引，并在隔离环境验证唯一冲突和复合查询。正式部署清单以 `cloudfunctions/deploy-manifest.json` 为准，只包含 `bakery` 和 `payment`；不得部署 `seed` 或 T0 探针。
+6. 通过受控的管理迁移创建首个 owner 和初始商品数据，不允许顾客 OPENID 自授 owner。仓库中的 `seed` 默认关闭，仅供已有 owner 在隔离环境、环境绑定和短时操作令牌同时满足时使用。
+7. 为 `bakery` 设置至少 32 字符的 `IDEMPOTENCY_HMAC_KEY`，只保存在云函数密钥配置中。把 `demoMode` 改成 `false` 前，先完成 CloudBase 权限、索引和 T0 动态验证。云端模拟支付默认关闭；隔离测试如需启用，必须同时设置 `ALLOW_DEMO_PAYMENT=true` 和匹配运行环境的 `DEMO_PAYMENT_ENV_ID`，不能连接真实顾客订单。
 
 ## 正式微信支付
 

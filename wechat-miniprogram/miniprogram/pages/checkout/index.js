@@ -2,6 +2,26 @@ const api = require("../../services/api");
 const payment = require("../../services/payment");
 const notifications = require("../../services/notifications");
 const { money } = require("../../utils/format");
+const CHECKOUT_INTENT_KEY = "xiaoyu-checkout-intent-v1";
+
+function checkoutIntent(input) {
+  const fingerprint = JSON.stringify({
+    slotId: input.slotId,
+    items: [...input.items].sort((left, right) => String(left.productId).localeCompare(String(right.productId))),
+    remark: input.remark,
+  });
+  const existing = wx.getStorageSync(CHECKOUT_INTENT_KEY);
+  if (existing && existing.fingerprint === fingerprint && Date.now() - existing.createdAt < 30 * 60 * 1000) {
+    return existing.idempotencyKey;
+  }
+  const intent = {
+    fingerprint,
+    idempotencyKey: `wx_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    createdAt: Date.now(),
+  };
+  wx.setStorageSync(CHECKOUT_INTENT_KEY, intent);
+  return intent.idempotencyKey;
+}
 
 Page({
   data: { lines: [], itemCount: 0, subtotal: "0", packageFee: "2", total: "0", slots: [], slotIndex: 0, slot: null, paying: false },
@@ -34,10 +54,12 @@ Page({
     if (!this.data.slot) return wx.showToast({ title: "请选择可约取货时段", icon: "none" });
     this.setData({ paying: true });
     try {
-      const reserved = await api.reserveOrder({ slotId: this.data.slot.id, items: this.data.lines.map((line) => ({ productId: line.id, quantity: line.quantity })), remark: "可颂请装纸袋", idempotencyKey: `wx_${Date.now()}_${Math.random().toString(36).slice(2)}` });
+      const orderInput = { slotId: this.data.slot.id, items: this.data.lines.map((line) => ({ productId: line.id, quantity: line.quantity })), remark: "可颂请装纸袋" };
+      const reserved = await api.reserveOrder({ ...orderInput, idempotencyKey: checkoutIntent(orderInput) });
       await payment.pay(reserved);
       const order = await api.confirmPayment(reserved.id);
       getApp().globalData.cart = {};
+      wx.removeStorageSync(CHECKOUT_INTENT_KEY);
       await notifications.requestOrderUpdates().catch(() => null);
       wx.redirectTo({ url: `/pages/checkout/success?orderId=${order.id}` });
     } catch (error) { wx.showToast({ title: error.message || "下单失败", icon: "none" }); this.setData({ paying: false }); }

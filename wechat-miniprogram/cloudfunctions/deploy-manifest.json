@@ -1,0 +1,4 @@
+{
+  "production": ["bakery", "payment"],
+  "excluded": ["seed", "t0-probe", "t0-probe-timer"]
+}

@@ -1,12 +1,10 @@
 import { demoPospalAdapter } from "@/lib/adapters";
-import { MERCHANT_EMAIL, MERCHANT_ID } from "@/lib/domain";
-import { actorFromRequest, HttpError, jsonError, readJson } from "@/lib/http";
+import { HttpError, jsonError, merchantActorFromRequest, readJson } from "@/lib/http";
 import { recordIntegrationEvent, setProductSoldOut } from "@/lib/store";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    if (request.headers.get("x-xiaoyu-role") !== "merchant") throw new HttpError(403, "需要门店权限");
-    const actor = actorFromRequest(request, { userId: MERCHANT_ID, email: MERCHANT_EMAIL });
+    const actor = merchantActorFromRequest(request);
     const body = await readJson<{ isSoldOut?: boolean }>(request);
     if (typeof body.isSoldOut !== "boolean") throw new HttpError(400, "isSoldOut 必须是布尔值");
     const { id } = await context.params;

@@ -8,18 +8,18 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "小雨面包｜预约自提业务版",
-  description: "小雨面包预约自提业务版，跑通真实库存、支付、门店接单、制作、备妥与核销闭环。",
+  title: "小雨面包｜预约自提 Demo",
+  description: "小雨面包预约自提交互 Demo，使用模拟库存、模拟支付和模拟商户数据。",
   metadataBase: new URL("https://maiyu-bakery-demo.openai.site"),
   openGraph: {
-    title: "小雨面包｜预约自提业务版",
-    description: "顾客预约自提 × 门店接单生产核销，D1 实时业务闭环。",
-    images: [{ url: "/og-v2.png", width: 1200, height: 630, alt: "小雨面包预约自提业务版" }],
+    title: "小雨面包｜预约自提 Demo",
+    description: "顾客预约自提 × 门店接单生产核销交互演示。",
+    images: [{ url: "/og-v2.png", width: 1200, height: 630, alt: "小雨面包预约自提 Demo" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "小雨面包｜预约自提业务版",
-    description: "顾客预约自提 × 门店接单生产核销，D1 实时业务闭环。",
+    title: "小雨面包｜预约自提 Demo",
+    description: "顾客预约自提 × 门店接单生产核销交互演示。",
     images: ["/og-v2.png"],
   },
 };

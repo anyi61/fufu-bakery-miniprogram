@@ -17,7 +17,7 @@
   <view class="member-copy"><text class="member-cn">会员\n充值中心</text><text class="member-en">MEMBER RECHARGE CENTER</text></view>
 
   <button class="hit hit-dine" aria-label="到店自取" bindtap="goOrder"></button>
-  <button class="hit hit-takeout" aria-label="外卖配送" bindtap="goOrder"></button>
-  <button class="hit hit-express" aria-label="快递邮寄" bindtap="express"></button>
+  <button class="hit hit-takeout" aria-label="外卖配送即将开放" data-title="外卖配送" bindtap="comingSoon"></button>
+  <button class="hit hit-express" aria-label="快递邮寄即将开放" data-title="快递邮寄" bindtap="comingSoon"></button>
   <button class="hit hit-member" aria-label="会员充值中心" bindtap="goProfile"></button>
 </view>

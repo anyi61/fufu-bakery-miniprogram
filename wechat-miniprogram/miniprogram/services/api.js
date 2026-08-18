@@ -50,6 +50,13 @@ async function bootstrap(surface = "customer") {
   return { products: state.products, slots: state.slots, latestOrder: state.orders[0] || null, adapterMode: "demo", merchantAuthorized: true };
 }
 
+async function getOrder(orderId) {
+  if (!config.demoMode) return cloud("getOrder", { orderId });
+  const order = demoState().orders.find((item) => item.id === orderId);
+  if (!order) throw new Error("订单不存在");
+  return order;
+}
+
 function id(prefix) {
   return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -152,4 +159,4 @@ function resetDemo() {
   wx.removeStorageSync(DEMO_KEY);
 }
 
-module.exports = { bootstrap, reserveOrder, confirmPayment, transitionOrder, setProductAvailability, resetDemo };
+module.exports = { bootstrap, getOrder, reserveOrder, confirmPayment, transitionOrder, setProductAvailability, resetDemo };

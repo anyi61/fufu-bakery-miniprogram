@@ -62,6 +62,7 @@ test("t0-probe 主门禁覆盖 disabled、环境和 operator token 拒绝矩阵"
     assert.ok(reasonCodes(mainEvaluation({ ...event, envId: "wrong-env" })).includes("ENV_ID_MISMATCH"));
     assert.ok(reasonCodes(mainEvaluation({ ...event, operatorToken: "fedcba9876543210fedcba9876543210" })).includes("OPERATOR_NOT_AUTHORIZED"));
     assert.ok(reasonCodes(mainEvaluation(event, { context: { namespace: "wrong-env" } })).includes("RUNTIME_ENV_MISMATCH"));
+    assert.ok(reasonCodes(mainEvaluation(event, { context: {}, wxContext: {} })).includes("RUNTIME_ENV_UNAVAILABLE"));
   });
 });
 

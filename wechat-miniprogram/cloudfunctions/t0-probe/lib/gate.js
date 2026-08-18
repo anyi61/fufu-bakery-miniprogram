@@ -275,7 +275,11 @@ function evaluate({ event, action, runId, cloud, context = {} }) {
   }
 
   const runtimeEnv = runtimeEnvironment(cloud, context);
-  if (runtimeEnv.envId && runtimeEnv.envId !== expectedEnvId) {
+  if (!runtimeEnv.envId) {
+    addReason(reasons, "RUNTIME_ENV_UNAVAILABLE", "current function environment id is unavailable");
+    return { ok: false, code: "T0_PROBE_DENIED", reasons, runtimeEnv };
+  }
+  if (runtimeEnv.envId !== expectedEnvId) {
     addReason(reasons, "RUNTIME_ENV_MISMATCH", "current function env does not match T0_PROBE_ENV_ID");
     return { ok: false, code: "T0_PROBE_DENIED", reasons, runtimeEnv };
   }

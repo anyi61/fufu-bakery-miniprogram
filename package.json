@@ -11,6 +11,10 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --test tests/*.test.mjs",
     "test:miniprogram": "node --test tests/miniprogram.test.mjs",
+    "test:deploy-manifest": "node --test tests/p0-cloudfunctions.test.mjs",
+    "test:docs-contract": "node --test tests/docs-contract.test.mjs",
+    "preflight:cloudbase": "node scripts/cloudbase-preflight.mjs",
+    "check": "npm test && npm run lint",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },

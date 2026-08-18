@@ -98,6 +98,78 @@ test("直接进入空购物车结算页时返回点单首页", async () => {
   delete global.wx;
 });
 
+test("结算失败重试复用同一业务意图幂等键", async () => {
+  const require = createRequire(import.meta.url);
+  const pagePath = fileURLToPath(new URL("miniprogram/pages/checkout/index.js", root));
+  const api = require(fileURLToPath(new URL("miniprogram/services/api.js", root)));
+  const payment = require(fileURLToPath(new URL("miniprogram/services/payment.js", root)));
+  const notifications = require(fileURLToPath(new URL("miniprogram/services/notifications.js", root)));
+  const original = {
+    reserveOrder: api.reserveOrder,
+    confirmPayment: api.confirmPayment,
+    pay: payment.pay,
+    requestOrderUpdates: notifications.requestOrderUpdates,
+  };
+  const keys = [];
+  api.reserveOrder = async (input) => { keys.push(input.idempotencyKey); return { id: "ord_retry_12345678" }; };
+  api.confirmPayment = async (id) => ({ id });
+  let paymentAttempts = 0;
+  payment.pay = async () => { paymentAttempts += 1; if (paymentAttempts === 1) throw new Error("网络超时"); };
+  notifications.requestOrderUpdates = async () => {};
+
+  let definition;
+  let storage;
+  global.Page = (value) => { definition = value; };
+  global.getApp = () => ({ globalData: { cart: { 1: 1 } } });
+  global.wx = {
+    getStorageSync() { return storage; },
+    setStorageSync(_key, value) { storage = value; },
+    removeStorageSync() { storage = undefined; },
+    showToast() {},
+    redirectTo() {},
+  };
+  delete require.cache[pagePath];
+  require(pagePath);
+  const context = {
+    data: { paying: false, lines: [{ id: 1, quantity: 1 }], slot: { id: "slot_1" } },
+    setData(value) { Object.assign(this.data, value); },
+  };
+  await definition.submit.call(context);
+  await definition.submit.call(context);
+  assert.equal(keys.length, 2);
+  assert.equal(keys[0], keys[1]);
+  assert.equal(storage, undefined);
+
+  Object.assign(api, { reserveOrder: original.reserveOrder, confirmPayment: original.confirmPayment });
+  payment.pay = original.pay;
+  notifications.requestOrderUpdates = original.requestOrderUpdates;
+  delete global.Page;
+  delete global.getApp;
+  delete global.wx;
+});
+
+test("订单成功页按路由 orderId 精确读取本人订单", async () => {
+  const require = createRequire(import.meta.url);
+  const pagePath = fileURLToPath(new URL("miniprogram/pages/checkout/success.js", root));
+  const api = require(fileURLToPath(new URL("miniprogram/services/api.js", root)));
+  const originalGetOrder = api.getOrder;
+  let requestedId;
+  api.getOrder = async (orderId) => { requestedId = orderId; return { id: orderId }; };
+  let definition;
+  global.Page = (value) => { definition = value; };
+  global.wx = { showToast() {}, switchTab() {}, navigateTo() {} };
+  delete require.cache[pagePath];
+  require(pagePath);
+  const context = { data: {}, setData(value) { Object.assign(this.data, value); } };
+  definition.onLoad.call(context, { orderId: "ord_exact_12345678" });
+  await definition.onShow.call(context);
+  assert.equal(requestedId, "ord_exact_12345678");
+  assert.equal(context.data.order.id, "ord_exact_12345678");
+  api.getOrder = originalGetOrder;
+  delete global.Page;
+  delete global.wx;
+});
+
 test("我的页面头像和菜单使用稳定的固定边界布局", async () => {
   const [template, styles, page] = await Promise.all([
     readFile(new URL("miniprogram/pages/profile/index.wxml", root), "utf8"),
@@ -162,7 +234,7 @@ test("首页关键点单布局保持左右分栏与底部结算栏", async () =>
   assert.match(cartBarRule, /grid-template-columns:\s*88rpx minmax\(0, 1fr\) 194rpx/);
 });
 
-test("FUFU 视觉首页提供四栏入口且插画适合进入主包", async () => {
+test("FUFU 视觉首页只开放自提业务并保留四栏导航", async () => {
   const [appSource, template, page, artwork, ...tabIcons] = await Promise.all([
     readFile(new URL("miniprogram/app.json", root), "utf8"),
     readFile(new URL("miniprogram/pages/landing/index.wxml", root), "utf8"),
@@ -175,8 +247,11 @@ test("FUFU 视觉首页提供四栏入口且插画适合进入主包", async () 
   assert.deepEqual(app.tabBar.list.map((item) => item.text), ["首页", "点单", "订单", "我的"]);
   assert.ok(app.tabBar.list.every((item) => item.iconPath && item.selectedIconPath));
   assert.match(template, /class="hit hit-dine"[^>]+bindtap="goOrder"/);
+  assert.match(template, /class="hit hit-takeout"[^>]+bindtap="comingSoon"/);
   assert.match(template, /class="hit hit-member"[^>]+bindtap="goProfile"/);
-  assert.match(template, /class="hit hit-express"[^>]+bindtap="express"/);
+  assert.match(template, /class="hit hit-express"[^>]+bindtap="comingSoon"/);
+  assert.equal((template.match(/bindtap="goOrder"/g) || []).length, 1);
+  assert.match(page, /comingSoon\(event\)/);
   assert.match(page, /wx\.switchTab\(\{ url: "\/pages\/home\/index" \}\)/);
   assert.ok(artwork.byteLength < 1024 * 1024, "首页插画应小于 1 MiB，避免挤占小程序主包");
   assert.ok(tabIcons.every((icon) => icon.byteLength < 40 * 1024), "tabBar 图标应满足微信 40 KiB 单文件限制");

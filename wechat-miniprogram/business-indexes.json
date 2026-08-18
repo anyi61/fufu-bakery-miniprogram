@@ -1,0 +1,61 @@
+{
+  "comment": "业务索引契约。部署到隔离环境后必须通过真实并发和唯一冲突测试，再复制到生产候选环境。",
+  "indexes": [
+    {
+      "collection": "inventory_plans",
+      "name": "idx_inventory_store_date_sku",
+      "unique": true,
+      "keys": [
+        { "field": "storeId", "direction": "asc" },
+        { "field": "businessDate", "direction": "asc" },
+        { "field": "skuId", "direction": "asc" }
+      ]
+    },
+    {
+      "collection": "slot_plans",
+      "name": "idx_slots_store_date_start",
+      "unique": false,
+      "keys": [
+        { "field": "storeId", "direction": "asc" },
+        { "field": "businessDate", "direction": "asc" },
+        { "field": "startsAt", "direction": "asc" }
+      ]
+    },
+    {
+      "collection": "order_reservations",
+      "name": "uniq_reservation_order",
+      "unique": true,
+      "keys": [
+        { "field": "orderId", "direction": "asc" }
+      ]
+    },
+    {
+      "collection": "orders",
+      "name": "idx_orders_customer_created",
+      "unique": false,
+      "keys": [
+        { "field": "customerOpenId", "direction": "asc" },
+        { "field": "createdAt", "direction": "desc" }
+      ]
+    },
+    {
+      "collection": "orders",
+      "name": "idx_orders_status_expires",
+      "unique": false,
+      "keys": [
+        { "field": "status", "direction": "asc" },
+        { "field": "expiresAt", "direction": "asc" }
+      ]
+    },
+    {
+      "collection": "staff",
+      "name": "idx_staff_openid_active",
+      "unique": false,
+      "keys": [
+        { "field": "openid", "direction": "asc" },
+        { "field": "storeId", "direction": "asc" },
+        { "field": "active", "direction": "asc" }
+      ]
+    }
+  ]
+}

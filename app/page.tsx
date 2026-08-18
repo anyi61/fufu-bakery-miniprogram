@@ -125,7 +125,7 @@ export default function Home() {
     try {
       const result = await api<{ order: OrderDto }>(`/api/orders/${data.latestOrder.id}/transition`, {
         method: "POST",
-        headers: { "content-type": "application/json", "x-xiaoyu-role": "merchant" },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ nextStatus, pickupCode }),
       });
       setData((current) => ({ ...current, latestOrder: result.order }));
@@ -143,7 +143,7 @@ export default function Home() {
     try {
       await api(`/api/products/${product.id}/availability`, {
         method: "POST",
-        headers: { "content-type": "application/json", "x-xiaoyu-role": "merchant" },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ isSoldOut: !product.isSoldOut }),
       });
       await refresh(true);
@@ -162,7 +162,7 @@ export default function Home() {
         <button className={surface === "customer" ? "active" : ""} onClick={() => setSurface("customer")}><span>◉</span> 顾客小程序</button>
         <button className={surface === "merchant" ? "active" : ""} onClick={() => setSurface("merchant")}><span>▦</span> 门店工作台 {data.latestOrder?.status === "pending_acceptance" && <i>1</i>}</button>
       </nav>
-      <div className="header-meta"><span className="online-dot" /> D1 实时业务版</div>
+      <div className="header-meta"><span className="online-dot" /> D1 模拟业务 Demo</div>
     </header>
 
     {surface === "customer" ? <CustomerSurface
@@ -237,7 +237,7 @@ function MerchantOrders(props: MerchantProps) {
   const orderCount = order ? 19 : 18;
   return <div className="merchant-content"><div className="kpi-row"><Kpi label="今日实收" value={`¥${order ? money(82400 + order.totalCents) : "824"}`} trend="较昨日 +12.4%" /><Kpi label="支付订单" value={String(orderCount)} trend="自提订单 100%" /><Kpi label="待处理" value={order?.status === "pending_acceptance" ? "1" : "0"} trend="请及时接单" alert={order?.status === "pending_acceptance"} /><Kpi label="准时备妥率" value="96.8%" trend="目标 ≥ 95%" /></div><div className="order-toolbar"><div><button className="active">全部订单</button><button>待接单 {order?.status === "pending_acceptance" && <i>1</i>}</button><button>制作中</button><button>待取货</button><button>已完成</button></div><div><button>筛选</button><button>导出</button></div></div>
     {order ? <article className="merchant-order"><div className="merchant-order-head"><div><span className="order-type">预约自提</span><b>#{order.displayNumber}</b><small>实时同步 · 取货 {slotText(order.slot)}</small></div><strong className={`status status-${Math.max(0, FLOW.indexOf(order.status))}`}>{order.statusLabel}</strong></div><div className="merchant-order-grid"><div className="customer-cell"><small>取货人</small><b>{order.customerName} · {order.customerPhoneMasked}</b><span>备注：{order.remark || "无"}</span></div><div className="goods-cell"><small>商品明细</small>{order.items.map((line) => <span key={line.productId}><b>{line.productName}</b><i>× {line.quantity}</i></span>)}</div><div className="amount-cell"><small>实付金额</small><b>¥{money(order.totalCents)}</b><span>微信支付 · {order.adapterMode}</span></div></div><div className="merchant-order-foot"><div><button>打印小票</button><button>联系顾客</button></div>{order.status === "ready" ? <div className="verify-box"><input value={props.verifyCode} onChange={(event) => props.setVerifyCode(event.target.value)} placeholder={`输入取餐码 ${order.pickupCodeDisplay.replace(/\s/g, "")}`} /><button disabled={props.busy} onClick={() => void props.transition("completed", props.verifyCode)}>核销取货</button></div> : next ? <button className="primary-order-action" disabled={props.busy} onClick={() => void props.transition(next)}>{order.status === "pending_acceptance" ? "接单并打印" : order.status === "accepted" ? "开始制作" : "标记已备妥"} →</button> : <span className="completed-check">✓ 已完成核销</span>}</div></article> : <div className="merchant-empty"><span>◎</span><h3>等待新订单</h3><p>请切换到顾客小程序完成一次下单</p></div>}
-    <div className="order-flow-hint"><b>实时业务流</b><span>顾客支付 → 门店接单 → 开始制作 → 标记备妥 → 动态取餐码核销</span></div></div>;
+    <div className="order-flow-hint"><b>模拟业务流</b><span>顾客模拟支付 → 门店接单 → 开始制作 → 标记备妥 → 动态取餐码核销</span></div></div>;
 }
 
 function Kpi({ label, value, trend, alert }: { label: string; value: string; trend: string; alert?: boolean }) {
